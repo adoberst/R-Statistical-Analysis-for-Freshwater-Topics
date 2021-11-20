@@ -1,0 +1,93 @@
+# Summer E. coli and water temperature measurements for 3 beaches in Milwaukee Co from 2016 - 2020
+# Data obtained from WI Beach Health
+
+# Load libraries
+library(stargazer)
+
+# Set working directory
+setwd("~/Desktop/Alicia Doberstein/UWM/Fresh Sci 650 R Based Stats/Wk 1 Summarizing Data")
+getwd()
+
+# Input data (Beach water quality data)
+bwq<- read.csv("BeachWaterQuality.csv", header=TRUE)
+
+# Inspect data
+str(bwq)                    # Data structure
+names(bwq)                  # List variable names
+unique(bwq$beach)           # List of beach names
+
+# CODE FOR BAR PLOT
+barplot(table(bwq$beach))                                            # Bar plot of samples taken at each of the 3 beaches
+
+# CODE FOR TABLE
+proportions(table(bwq$beach))                                        # Frequency table: proportion of samples taken at each of the 3 beaches 
+
+# CODE FOR HISTOGRAM                                                 # Histogram of water temperature
+hist(bwq$temp,
+     main="Histogram of water temperature F",
+     xlab="Temperature ")   
+
+# DESCRIPTION OF DISTRIBUTION
+# unimodal, symmetric, broad spread, no outliers
+# Based on this histogram we'd use SD and mean over five-point summary to describe the distribution because the distribution is relatively normal, symmetric, with no outliers
+
+# MEAN & STANDARD DEVIATION OR FIVE-NUMBER SUMMARY FOR COMPARISON
+bwq.sub <- subset(bwq,select=c(beach,ecoli,temp))                     # not necessary but illustrative of how subset command works
+subset(bwq.sub,select=c(temp))                                        # not necessary but illustrative of how subset command works
+stargazer(subset(bwq,select=c(temp)), type="text")                    # subset commant is embedded
+
+# DENSITY PLOT
+# Density 1
+plot(density(bwq$ecoli, na.rn=TRUE))
+# Density 2 w/ adjustment
+plot(density(bwq$ecoli, na.rn=TRUE, bw=10))
+
+# DESCRIPTION OF DISTRIBUTION
+# Right skew, multimodal - one main peak and 3 small peaks
+# It makes sense to describe this using five-point summary over SD and mean
+# This is because it is very right skewed therefore the five-point summary offers more information regarding distributions among quartiles and a better sense of graph shape
+
+# CODE FOR MEAN & STANDARD DEVIATION OR FIVE-NUMBER SUMMARY
+summary(bwq$ecoli)
+
+# CODE FOR BOX PLOT
+boxplot(bwq$ecoli ~ bwq$beach)
+
+# COMPARISON OF BOX PLOTS
+# What does the plot indicate about the relative distributions of E. coli at the three locations?
+# Bayview - right skew second lowest median, second smallest inner quartile spread, close second lowest lowerbound, second highest upperbound, 7 outliers with one peak around 325 MPN/100 mL.
+# Bradford - right skew, lowest median, smallest inter quartile spread, highest lowerbound and lowest upperbound, 13 outliers with a peak around 130 MPN/100mL and small bump around 250 MPN/100mL
+# McKinely - right skew, highest median, largest inter quartile spread, lowest lowerbound and highest upperbound, 6 outliers that are evenly distributed
+
+subset(bwq.sub,select=c(ecoli))
+stargazer(subset(bwq,select=c(ecoli)), type="text")
+stargazer(subset(bwq,beach=="Bay View Park Beach",select=c(ecoli)), type="text")
+stargazer(subset(bwq,beach=="Bradford Beach",select=c(ecoli)), type="text")
+stargazer(subset(bwq,beach=="McKinley Beach",select=c(ecoli)), type="text")
+
+# Bayview Park Beach IQR Calculations
+115.5-10            # IQR 105.5
+
+10-(105.5*1.5)      # Lower bound -148.25
+115.5+(105.5*1.5)   # Upper bound 273.75
+
+# Bradford Beach IQR Calculations
+57.525-6.300        # IQR 51.225
+
+6.300-(51.225*1.5)  # Lower bound -70.5375
+57.525+(51.225*1.5) # Upper bound 134.3625
+
+# McKinley Beach IQR Calculations
+156.500-24.300      #IQR 132.2
+
+24.300-(132.2*1.5)   # Lower bound -174
+156.500+(132.2*1.5)  # Upper bound 354.8
+
+# An advisory is issued whenever E. coli exceeds 235 MPN/100 mL.
+# Which beach would you recommend visiting if real-time information beach water quality was not available?
+# Based on the advisory of 235 MPN/100 mL I would recommend bradford beach for the safest
+# I chose bradford because the disribution is narrow and right skewed indicating that the majority of data points collected were under 75 MPN/100 mL, according to the y-axis. Bradford has the most outliers although 7 are above the 235 MPN/100 mL.
+# I chose to consider outliers in this decison because although often they are bad data points, when dealing with E. coli and public interaction there is potential for bloom and it could be an identification that similar values could occur as time passes.
+# Granted, these data points were collected across multiple years instead of a single year so it is difficult to say.
+# Regardless, bradford appears to be the safest in comparing it against McKinley that looks similarly to Bradford in that it is right skewed and has a median value on the lower-value end but the distribution is broad and the upper whisker exceeds the 235 MPN/100 mL.
+# In looking at Bayview, the skew is also right with a distribution inbetween broad and narrow, and the upper whisker and outliers also exceeds 235 MPN/100 mL.
