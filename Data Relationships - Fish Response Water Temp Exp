@@ -1,0 +1,67 @@
+# Data Relationships
+
+# Load Libraries
+library(stargazer)
+library(carData)
+library(car) 
+library(dplyr)
+
+# Input data (Tomiyama)
+Tom<- read.csv("Tomiyama et al_2018_Flounder.csv", header=TRUE)
+
+# Consider the relationship between change in body weight and food intake with evaluation of distributional properties of each variable
+# Density plot and variable Distribution
+plot(density(Tom$dW))                                                        # Density plot for body weight
+plot(density(Tom$FoodIntake.mg))                                             # Density plot for food intake 
+
+# Body weight density plot is right skewed
+# Indicates that the mean is greater than the median value and there is a possibility for outliers
+# We would expect large weight gain but not negative gain
+# Skew is in part because it is 'bounded' on one side
+
+# Food intake density plot is trimodal
+# The tri-modal distribution is likely due to the experimental design
+# Likely the result of there being three length classes in the experiment and on average larger classes consume more food
+
+# Summary statistics table (mean, standard deviation, and five-number summary)
+stargazer(subset(Tom,select=c(dW, FoodIntake.mg)),median=TRUE,type="text")   # Descriptive statistics
+
+# Scatterplot
+plot(Tom$FoodIntake.mg,Tom$dW)                                               # Scatter plot
+
+# Relationship between the two variables
+# There is a linear and strong positive association between food intake and change in body weight
+# The association is stronger at lower food intake indicating and weaker at higher intake and body weight change so strength is partial
+# There is the possiblity of one outlier
+
+
+# Quantify the association between dW and FoodIntake.mg
+cor(Tom$dW, Tom$FoodIntake.mg)                                             # Correlation 2-variables
+
+# The calculated correlation value of 0.95 is greater than 0 towards 1 therefore we can imply a strong positive association between the change in weight and food intake
+# Based on the scatterplot, the correlation coefficient a valid description of the association between the change in weight and food intake
+# The correlation is slightly less valid considering that the distribution is stronger at lower points between the x and y axis
+# It is still strong towards higher numbers but slightly weaker
+# The correlation coefficient is valid but the scatterplot tells more information
+
+
+# Water temperature affects on growth (not using multiple explanatory variables)
+# Scatter plot of dW and FoodIntake.mg by (conditional on) water temperature level (WT).
+scatterplot(dW~FoodIntake.mg, groups=Tom$WT, data=Tom, regLine=TRUE, 
+            smooth=TRUE)                                                 # Conditional scatter plot
+            
+# The conditional scatterplot implies that at the lowest temperatures, there is little food intake and little growth
+# As temperature increases it appears the slope of the best-fit-line may decrease
+# This indicates that at higher water temperatures food intake has less of an effect on growth 
+
+
+# Two-way table with margins between dWavg and WT.
+
+twoway<-proportions(table(Tom$WT,Tom$dWavg))                  # Two-way table (proportions)
+twoway_margins <- addmargins(twoway)                          # Create object: two-way table (counts) with margins
+round(twoway_margins,digits=3)                                # Two-way table (rounded proportions) with margins
+
+
+# Proportion of fish jointly had an above average change in weight and were in the 18 ˚C water temperature treatment is 0.102
+# Proportion of fish were in the 12 ˚C water temperature treatment is 0.167
+# Proportion of fish had below average growth conditional on being in a treatment with water temperatures greater than 17 ˚C is 0.239
